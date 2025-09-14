@@ -36,14 +36,12 @@ if [[ "${1:-}" == "-c" ]]; then
 fi
 
 # checks
-if ! command -v sbsign &>/dev/null; then
-    echo "exception: sbsign is not installed. go install it from your package manager."
-    exit 1
-fi
-if ! command -v sbverify &>/dev/null; then
-    echo "exception: sbverify is not installed. usually in sbsigntools."
-    exit 1
-fi
+for cmd in sbsign sbverify; do      # loop esta mejor                      
+    if ! command -v "$cmd" &>/dev/null; then
+        echo "exception: $cmd is not installed. install it from your package manager."
+        exit 1
+    fi
+done
 if [ ! -f "$KEY" ] || [ ! -f "$CERT" ]; then
     echo "Error: key or cert not found at $KEY / $CERT"
     exit 1
