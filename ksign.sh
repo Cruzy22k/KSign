@@ -63,12 +63,11 @@ if [ ${#KERNELS[@]} -eq 0 ]; then
 fi
 
 
+UNSIGNED_KERNELS=() # remove current running kernel and check if signed.
 for kernel in "${KERNELS[@]}"; do
-    [[ "$kernel" == "$CURRENT_VMLINUZ" ]] && continue # remove cur
-    if sbverify --list "$kernel" 2>&1 | grep -q "signature"; then
-        # Already signed
-        continue
-    else
+    [[ "$kernel" == "$CURRENT_VMLINUZ" ]] && continue
+    # Check if signature exists in sbverify output
+    if ! sbverify --list "$kernel" 2>&1 | grep -q "signature"; then
         UNSIGNED_KERNELS+=("$kernel")
     fi
 done
