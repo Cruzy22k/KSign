@@ -10,6 +10,15 @@ CURRENT_VMLINUZ="/boot/vmlinuz-$CURRENT_KERNEL"
 KEY="/root/mok/MOK.key"
 CERT="/root/mok/MOK.crt"
 
+if ! command -v sbsign &> /dev/null; then
+    echo "sbsign is not installed"
+    exit 1
+fi
+
+if [ ! -f "$KEY" ] || [ ! -f "$CERT" ]; then
+    echo "Key or cert not found at $KEY or $CERT"
+    exit 1
+fi
 
 KERNELS=($(ls /boot/vmlinuz-* 2>/dev/null))
 if [ ${#KERNELS[@]} -eq 0 ]; then
