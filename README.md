@@ -39,7 +39,7 @@ There are two recommended methods.
 
 1. Using Cron (Simpler)
 
-Download the automated script:
+- Download the automated script:
 
 ```
 cd /root
@@ -47,17 +47,17 @@ cd /root
 curl -LO https://raw.githubusercontent.com/Cruzy22k/KSign/main/cron_ksign.sh
 chmod +x cron_ksign.sh
 ```
-and edit the root crontab with:
+- and edit the root crontab with:
 ```
 sudo crontab -e
 ```
-Append this line to run the script after boot.
+- Append this line to run the script after boot.
 
 ```
 @reboot /root/cron_ksign.sh
 ```
 
-The script will only sign unsigned kernels once per day and skips the currently running kernel. Logs are written to `/var/log/ksign.log`.
+- The script will only sign unsigned kernels once per day and skips the currently running kernel. Logs are written to `/var/log/ksign.log`.
 
 ----
 
