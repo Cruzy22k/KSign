@@ -1,21 +1,21 @@
 #!/bin/bash
 set -euo pipefail
-# KSign cron job script simple version.
-# Just signs any unsigned kernels in /boot except the currently running one.
+# KSign cron job script made way more simple.
+# Signs any unsigned kernels in /boot except the currently running one.
+
 KEY="/root/mok/MOK.key"
 CERT="/root/mok/MOK.crt"
 LOGFILE="/var/log/ksign.log"
 LASTRUN_FILE="/var/log/ksign.last"
 
-# skip if already ran today. use the other script for manual use.
+# Skip if already ran today
 if [[ -f "$LASTRUN_FILE" ]]; then
     LASTRUN=$(date -r "$LASTRUN_FILE" +%Y-%m-%d)
     TODAY=$(date +%Y-%m-%d)
     [[ "$LASTRUN" == "$TODAY" ]] && exit 0
 fi
 
-
-CURRENT_KERNEL=$(uname -r) # stop dumbasses writing to the currently running kernel
+CURRENT_KERNEL=$(uname -r) 
 CURRENT_VMLINUZ="/boot/vmlinuz-$CURRENT_KERNEL"
 
 for kernel in /boot/vmlinuz-*; do
@@ -27,7 +27,7 @@ for kernel in /boot/vmlinuz-*; do
             mv "$tmpfile" "$kernel"
             echo "$(date): Signed $kernel successfully" >> "$LOGFILE"
         else
-            echo "$(date): verif failed for $kernel" >> "$LOGFILE"
+            echo "$(date): Verification failed for $kernel" >> "$LOGFILE"
             rm -f "$tmpfile"
         fi
     fi

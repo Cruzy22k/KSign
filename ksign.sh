@@ -8,103 +8,97 @@ echo -e "${GREEN}<KSign>  Copyleft (C) 2024  Cruzy22k${RESET}"
 echo -e "${GREEN}This program comes with ABSOLUTELY NO WARRANTY.${RESET}"
 echo -e "${GREEN}This is free software, and you are welcome to redistribute it under certain conditions.${RESET}"
 echo
-
-
+echo "dont sign rescue kernels, i am not sure what that might do."
 usage() {
     cat <<EOF
 Usage: $0 [OPTION]
 
 Options:
-  -a      auto sign every kernel for crontab or smt
+  -a      auto sign every kernel in /boot (cron-friendly)
   -h      show help
   -c      credits
+  -k      specify key file (default: /root/mok/MOK.key)
+  -t      specify cert file (default: /root/mok/MOK.crt)
 Description:
-  KSign is a kernel signing tool.
-  useful if you run a custom kernel like Cachyos but want Secure boot to be enabled, and 
-  want to automate the signing of each new kernel as it releases.
+  KSign is a universal kernel signing tool.
+  Automatically signs new kernels for Secure Boot.
 EOF
 }
-creds(){
+
+creds() {
     echo "Made with <3 by Cruzy"
 }
 
-# Stop dumbasses writing to the currently running kernel
-CURRENT_KERNEL=$(uname -r)
-CURRENT_VMLINUZ="/boot/vmlinuz-$CURRENT_KERNEL"
-KEY="/root/mok/MOK.key"
+KEY="/root/mok/MOK.key" # adjustable but probably best to use /root/mok
 CERT="/root/mok/MOK.crt"
 
-# KSign kernel signing tool developed by Cruzy.
+while getopts "ahck:t:" opt; do
+    case $opt in
+        a) AUTO=1 ;;
+        h) usage; exit 0 ;;
+        c) creds; exit 0 ;;
+        k) KEY="$OPTARG" ;;
+        t) CERT="$OPTARG" ;;
+        *) usage; exit 1 ;;
+    esac
+done # case esta mejor
 
-if [[ "${1:-}" == "-h" ]]; then
-    usage
-    exit 0
-fi
-if [[ "${1:-}" == "-c" ]]; then
-    creds
-    exit 0
-fi
+CURRENT_KERNEL=$(uname -r) # stop dumbasses flshing cur kern
+CURRENT_VMLINUZ="/boot/vmlinuz-$CURRENT_KERNEL" # set
 
-# checks
-for cmd in sbsign sbverify; do      # loop esta mejor                      
+# check dependencies
+for cmd in sbsign sbverify; do
     if ! command -v "$cmd" &>/dev/null; then
-        echo "exception: $cmd is not installed. install it from your package manager."
+        echo "exception: $cmd is not installed. go install it"
         exit 1
     fi
 done
 if [ ! -f "$KEY" ] || [ ! -f "$CERT" ]; then
-    echo "Error: key or cert not found at $KEY / $CERT"
-    exit 1
-fi
-mapfile -t KERNELS < <(ls /boot/vmlinuz-* 2>/dev/null || true) 
-if [ ${#KERNELS[@]} -eq 0 ]; then
-    echo "No kernels found in /boot/"
+    echo "exception: key or cert not found at $KEY / $CERT" 
+    echo "Instructions are at the bottome of the readme."
     exit 1
 fi
 
-UNSIGNED_KERNELS=() # remove cur running kernel and check if signed.
-for kernel in "${KERNELS[@]}"; do 
+mapfile -t KERNELS < <(ls /boot/vmlinuz-* 2>/dev/null || true)
+if [ ${#KERNELS[@]} -eq 0 ]; then
+    echo "No kernels found in /boot/" # should'nt really happen but edge case
+    exit 0
+fi
+
+# remove currently running kernel from list
+UNSIGNED_KERNELS=()
+for kernel in "${KERNELS[@]}"; do
     [[ "$kernel" == "$CURRENT_VMLINUZ" ]] && continue
-    if ! sbverify --list "$kernel" &>/dev/null; then
-        UNSIGNED_KERNELS+=("$kernel")
-    fi
+    UNSIGNED_KERNELS+=("$kernel")
 done
 
 if [ ${#UNSIGNED_KERNELS[@]} -eq 0 ]; then
-    echo "no unsigned kernels found."
+    echo "No kernels to sign (only running kernel present)."
     exit 0
-fi 
+fi
 
-if [[ "${1:-}" == "-a" ]]; then # -a
-    echo "auto mode for running as like a cronjob or something."
+# auto mode
+if [[ "${AUTO:-}" == "1" ]]; then
+    echo "Auto-signing kernels in /boot..."
     for kernel in "${UNSIGNED_KERNELS[@]}"; do
         tmpfile="${kernel}.signed"
+        echo "Signing $kernel..."
         sbsign --key "$KEY" --cert "$CERT" --output "$tmpfile" "$kernel"
-        if sbverify --list "$tmpfile" &>/dev/null; then
-            mv "$tmpfile" "$kernel"
-            echo "Signed $kernel successfully"
-        else
-            echo "Verification failed for $kernel"
-            rm -f "$tmpfile"
-        fi
+        mv "$tmpfile" "$kernel"
+        echo "Signed $kernel successfully."
     done
     exit 0
 fi
 
+# interactive mode
 PS3="Select a kernel to sign: "
 select kernel in "${UNSIGNED_KERNELS[@]}"; do
     if [ -n "$kernel" ]; then
         echo "Signing $kernel..."
         tmpfile="${kernel}.signed"
         sbsign --key "$KEY" --cert "$CERT" --output "$tmpfile" "$kernel"
-        echo "Verifying signature..."
-        if sbverify --list "$tmpfile" &>/dev/null; then
-            mv "$tmpfile" "$kernel"
-            echo "Signed $kernel successfully"
-        else
-            echo "Verification failed, leaving original untouched"
-            rm -f "$tmpfile"
-        fi
+        mv "$tmpfile" "$kernel"
+        echo "Signed $kernel successfully."
         break
     else
         echo "invalid selection."
