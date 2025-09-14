@@ -1,10 +1,14 @@
-# Ksign kernel signing tool. WIP
+# Ksign kernel signing tool.
+
 ## A tool for signing kernels.
+> [!NOTE]
+> This script comes with absolutely no warranty in any way.
 
 ## Purpose of this script
-This script automates the signing of kernels, that are not signed by Microsofts signing key. This is particulary useful if you run a standard linux installation, but run a custom kernel such as the Cachyos kernel. It saves time by automating the signing of the kernels each update.
+This script automates the signing of kernels, that are not signed by Microsoft's signing key. This is particulary useful if you run a standard linux installation, but run a custom kernel such as the Cachyos kernel. It saves time by automating the signing of the kernels each update.
 
-
+----
+    
 ## Prerequisites
 To run this script, make sure that you have the following dependencies installed.
 - Both your MOK key and cert, located in `/root/mok`. (See below for setup instructions.)
@@ -12,7 +16,7 @@ To run this script, make sure that you have the following dependencies installed
 - `sbverify`
 - An internet connection.
 - A brain (optional)
------
+
 
 ## Usage
 
