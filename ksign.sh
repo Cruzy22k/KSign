@@ -6,6 +6,9 @@ CURRENT_VMLINUZ="/boot/vmlinuz-$CURRENT_KERNEL"
 
 # KSign kernel signing tool developed by Cruzy.
 
+## TODO
+# - sign the kernel, verify and then replace. 
+# - check if kernel is alr signed and remove it from list
 
 KEY="/root/mok/MOK.key"
 CERT="/root/mok/MOK.crt"
