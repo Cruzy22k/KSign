@@ -46,8 +46,8 @@ Follow the prompts to select the kernel to sign.
     This command will give you a prompt to enter a password of your choosing.
     Remember the password you set as you will need it in the next step.
 
-    > [!NOTE]  
-    > You may need to install mokutil from your package manager
+> [!NOTE]  
+> You may need to install mokutil from your package manager
 - 3: 
     Reboot and follow the MOK manager prompts to enroll the custom signing key with the password you set.
 - 4:
