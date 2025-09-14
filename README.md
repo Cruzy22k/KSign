@@ -30,7 +30,8 @@ Follow the prompts to select the kernel to sign.
 
 ## Automation
 
-You can use Ksign automatically once per day after login. There are two recommended methods.
+You can use also use Ksign automatically daily.
+There are two recommended methods.
 
 1. Using Cron (Simpler)
 
@@ -47,7 +48,11 @@ and edit the root crontab with:
 sudo crontab -e
 ```
 Append this line to run the script after boot.
-`@reboot /root/cron_ksign.sh`
+
+```
+@reboot /root/cron_ksign.sh
+```
+
 The script will only sign unsigned kernels once per day and skips the currently running kernel. Logs are written to `/var/log/ksign.log`.
 
 
