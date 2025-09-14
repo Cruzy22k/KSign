@@ -55,6 +55,8 @@ Append this line to run the script after boot.
 
 The script will only sign unsigned kernels once per day and skips the currently running kernel. Logs are written to `/var/log/ksign.log`.
 
+----
+
 
 2. Using Systemd Timer (Recommended, more complicated to setup.)
 - Create a user service file:
