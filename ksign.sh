@@ -62,18 +62,17 @@ if [ ${#KERNELS[@]} -eq 0 ]; then
     exit 1
 fi
 
-UNSIGNED_KERNELS=() # remove cur running kernel and check if signed.
-for kernel in "${KERNELS[@]}"; do 
-    [[ "$kernel" == "$CURRENT_VMLINUZ" ]] && continue
-    if ! sbverify --list "$kernel" &>/dev/null; then
+
+for kernel in "${KERNELS[@]}"; do
+    [[ "$kernel" == "$CURRENT_VMLINUZ" ]] && continue # remove cur
+    if sbverify --list "$kernel" 2>&1 | grep -q "signature"; then
+        # Already signed
+        continue
+    else
         UNSIGNED_KERNELS+=("$kernel")
     fi
 done
 
-if [ ${#UNSIGNED_KERNELS[@]} -eq 0 ]; then
-    echo "no unsigned kernels found."
-    exit 0
-fi 
 
 if [[ "${1:-}" == "-a" ]]; then # -a
     echo "auto mode for running as like a cronjob or something."
