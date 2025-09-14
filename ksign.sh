@@ -4,7 +4,7 @@ set -euo pipefail
 GREEN="\e[32m"
 RESET="\e[0m"
 
-echo -e "${GREEN}<Firmware2>  Copyleft (C) 2024  Cruzy22k${RESET}"
+echo -e "${GREEN}<KSign>  Copyleft (C) 2024  Cruzy22k${RESET}"
 echo -e "${GREEN}This program comes with ABSOLUTELY NO WARRANTY.${RESET}"
 echo -e "${GREEN}This is free software, and you are welcome to redistribute it under certain conditions.${RESET}"
 echo
