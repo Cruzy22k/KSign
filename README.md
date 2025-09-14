@@ -16,17 +16,89 @@ To run this script, make sure that you have the following dependencies installed
 
 ## Usage
 
-To use this script, run the following command on your device.
+Run the script in interactive mode:
 
 ```
-curl -LO https://raw.githubusercontent.com/Cruzy22k/KSign/main/ksign.sh && sudo bash ksign.sh
+curl -LO https://raw.githubusercontent.com/Cruzy22k/KSign/main/ksign.sh
+sudo bash ksign.sh
 ```
-
 Follow the prompts to select the kernel to sign. 
+
 ### Options:
 - `ksign.sh -a` to enable automated mode, which signs every kernel in `/boot`
 - `ksign.sh -h` for help using the tool
 
+## Automation
+
+You can use Ksign automatically once per day after login. There are two recommended methods.
+
+1. Using Cron (Simpler)
+
+Download the automated script:
+
+```
+cd /root
+# Download the automated KSign script
+curl -LO https://raw.githubusercontent.com/Cruzy22k/KSign/main/cron_ksign.sh
+chmod +x cron_ksign.sh
+```
+and edit the root crontab with:
+```
+sudo crontab -e
+```
+Append this line to run the script after boot.
+`@reboot /root/cron_ksign.sh`
+The script will only sign unsigned kernels once per day and skips the currently running kernel. Logs are written to `/var/log/ksign.log`.
+
+
+2. Using Systemd Timer (Recommended, more complicated to setup.)
+- Create a user service file:
+```
+mkdir -p ~/.config/systemd/user
+nano ~/.config/systemd/user/ksign.service
+
+```
+
+- Paste this into it:
+```
+[Unit]
+Description=Sign kernels once a day after login
+After=graphical.target
+
+[Service]
+Type=oneshot
+ExecStart=/root/cron_ksign.sh
+
+[Install]
+WantedBy=default.target
+```
+Save and exit (`Ctrl+O`, `Ctrl+X`).
+- Create the timer file: 
+```
+nano ~/.config/systemd/user/ksign.timer
+```
+- Paste this into it:
+```
+[Unit]
+Description=Run KSign once per day
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+```
+Save and exit (`Ctrl+O`, `Ctrl+X`).
+
+Enable and start the timer with:
+```
+systemctl --user enable --now ksign.timer
+```
+
+(This method is more robust than cron, integrates with systemd logging, and ensures KSign runs once per day automatically.)
+----
+Both methods prevent signing the currently running kernel and keep logs in /var/log/ksign.log.
 
 ----
 ### Setting up a MOK Key. (if not already done.)

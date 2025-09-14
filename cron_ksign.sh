@@ -5,6 +5,15 @@ set -euo pipefail
 KEY="/root/mok/MOK.key"
 CERT="/root/mok/MOK.crt"
 LOGFILE="/var/log/ksign.log"
+LASTRUN_FILE="/var/log/ksign.last"
+
+# skip if already ran today. use the other script for manual use.
+if [[ -f "$LASTRUN_FILE" ]]; then
+    LASTRUN=$(date -r "$LASTRUN_FILE" +%Y-%m-%d)
+    TODAY=$(date +%Y-%m-%d)
+    [[ "$LASTRUN" == "$TODAY" ]] && exit 0
+fi
+
 
 CURRENT_KERNEL=$(uname -r) # stop dumbasses writing to the currently running kernel
 CURRENT_VMLINUZ="/boot/vmlinuz-$CURRENT_KERNEL"
@@ -23,3 +32,4 @@ for kernel in /boot/vmlinuz-*; do
         fi
     fi
 done
+touch "$LASTRUN_FILE"
