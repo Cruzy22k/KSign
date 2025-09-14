@@ -1,5 +1,11 @@
 #!/bin/bash
 set -euo pipefail
+echo -e "\e[32m<Firmware2>  Copyleft (C) 2024  Cruzy22k\e[0m"
+echo -e "\e[32mThis program comes with ABSOLUTELY NO WARRANTY.\e[0m"
+echo -e "\e[32mThis is free software, and you are welcome to redistribute it under certain conditions.\e[0m"
+echo
+
+
 usage() {
     cat <<EOF
 Usage: $0 [OPTION]
