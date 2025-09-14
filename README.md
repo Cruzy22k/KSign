@@ -98,8 +98,8 @@ systemctl --user enable --now ksign.timer
 > [!NOTE]  
 > This method is more robust than cron, integrates with systemd logging, and ensures KSign runs once per day automatically.
 
-----
-Both methods prevent signing the currently running kernel and keep logs in /var/log/ksign.log.
+> [!NOTE]
+>Both methods prevent signing the currently running kernel and keep logs in /var/log/ksign.log.
 ----
 ### Setting up a MOK Key. (if not already done.)
 
